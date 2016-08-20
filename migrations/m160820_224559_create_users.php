@@ -16,7 +16,7 @@ class m160820_224559_create_users extends Migration
             'authkey' => $this->string(255)->notNull(),
             'first_name' => $this->string(64),
             'last_name' => $this->string(128),
-            'access-token' => $this->string(255),
+            'access_token' => $this->string(255),
             'last_login_time' => $this->dateTime()->notNull()->defaultValue(0),
             'token_expiration' => $this->dateTime(),
         ]);
@@ -26,19 +26,19 @@ class m160820_224559_create_users extends Migration
            'username' => 'dholzgang',
             'password' => Yii::$app->getSecurity()->generatePasswordHash('r3dcl0v3r'),
             'authkey' => uniqid(),
-            'access-token' => Yii::$app->getSecurity()->generateRandomString(),
+            'access_token' => Yii::$app->getSecurity()->generateRandomString(),
         ]);
         $this->insert('user', [
            'username' => 'admin',
             'password' => Yii::$app->getSecurity()->generatePasswordHash('admin'),
             'authkey' => uniqid(),
-            'access-token' =>  Yii::$app->getSecurity()->generateRandomString(),
+            'access_token' =>  Yii::$app->getSecurity()->generateRandomString(),
         ]);
         $this->insert('user', [
            'username' => 'demo',
             'password' => Yii::$app->getSecurity()->generatePasswordHash('demo'),
             'authkey' => uniqid(),
-            'access-token' =>  Yii::$app->getSecurity()->generateRandomString(),
+            'access_token' =>  Yii::$app->getSecurity()->generateRandomString(),
         ]);
     }
 

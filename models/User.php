@@ -13,7 +13,7 @@ use Yii;
  * @property string $authkey
  * @property string $first_name
  * @property string $last_name
- * @property string $access-token
+ * @property string $access_token
  * @property string $last_login_time
  * @property string $token_expiration
  */
@@ -38,7 +38,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             [['last_login_time', 'token_expiration'], 'safe'],
             [['username'], 'string', 'max' => 24],
             [['password'], 'string', 'max' => 126],
-            [['authkey', 'access-token'], 'string', 'max' => 255],
+            [['authkey', 'access_token'], 'string', 'max' => 255],
             [['first_name'], 'string', 'max' => 64],
             [['last_name'], 'string', 'max' => 128],
         ];
@@ -53,12 +53,12 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
             'id' => 'ID',
             'username' => 'Username',
             'password' => 'Password',
-            'authkey' => 'Auth Key',
+            'authkey' => 'Authkey',
             'first_name' => 'First Name',
             'last_name' => 'Last Name',
-            'access-token' => 'Access Token',
-            'last_login_time' => 'Last Login At',
-            'token_expiration' => 'Token Expires At',
+            'access_token' => 'Access Token',
+            'last_login_time' => 'Last Login Time',
+            'token_expiration' => 'Token Expiration',
         ];
     }
 
@@ -72,7 +72,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
       $fields = parent::fields();
       
       if (Yii::$app->user->getId() !== $this->getId()) {
-        unset($fields['password'], $fields['authkey'], $fields['accessToken']);
+        unset($fields['password'], $fields['authkey'], $fields['access_token']);
       }
       
       return $fields;
@@ -105,7 +105,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      */
     public static function findIdentityByAccessToken($token, $type = null)
     {
-      return self::findOne(['accessToken' => $token]);
+      return self::findOne(['access_token' => $token]);
     }
 
     
@@ -159,5 +159,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     {
       return Yii::$app->getSecurity()->validatePassword($password, $this->password);
     }
-    
+
+     
 }
