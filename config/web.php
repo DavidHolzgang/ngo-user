@@ -33,19 +33,21 @@ $config = [
             'targets' => [
                 [
                     'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
+                    'levels' => ['error', 'warning', 'info', 'trace'],
                 ],
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
-        /*
+        //
         'urlManager' => [
             'enablePrettyUrl' => true,
+            'enableStrictParsing' => true,
             'showScriptName' => false,
             'rules' => [
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'user'],
             ],
         ],
-        */
+        //
     ],
     'params' => $params,
 ];
@@ -59,7 +61,8 @@ if (YII_ENV_DEV) {
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
-        'class' => 'yii\gii\Module',
+      'class' => 'yii\gii\Module',
+      'allowedIPs' => ['127.0.0.1', '::1', '10.0.0.140'] // allow devserver01 as well as localhost
     ];
 }
 
