@@ -15,7 +15,7 @@ class LoginFormCest
     // demonstrates `amLoggedInAs` method
     public function internalLoginById(\FunctionalTester $I)
     {
-        $I->amLoggedInAs(100);
+        $I->amLoggedInAs(2);
         $I->amOnPage('/');
         $I->see('Logout (admin)');
     }
