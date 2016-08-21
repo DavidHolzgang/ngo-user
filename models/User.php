@@ -9,7 +9,6 @@ use Yii;
  *
  * @property integer $id
  * @property string $username
- * @property string $email
  * @property string $password
  * @property string $authkey
  * @property string $first_name
@@ -35,8 +34,8 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
     public function rules()
     {
         return [
-            [['username', 'email', 'password', 'authkey'], 'required'],
-            [['email'], 'email'],
+            [['username', 'password', 'authkey'], 'required'],
+            [['username'], 'email'],
             [['last_login_time', 'token_expiration'], 'safe'],
             [['username', 'email', 'last_name'], 'string', 'max' => 128],
             [['password'], 'string', 'max' => 126],

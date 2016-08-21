@@ -13,7 +13,6 @@ class m160820_224559_create_users extends Migration
     $this->createTable('user', [
         'id' => $this->primaryKey(),
         'username' => $this->string(128)->notNull(),
-        'email' => $this->string(128)->notNull(),
         'password' => $this->string(126)->notNull(),
         'authkey' => $this->string(255)->notNull(),
         'first_name' => $this->string(64),
@@ -25,22 +24,19 @@ class m160820_224559_create_users extends Migration
 
     // basic set of logins for testing
     $this->insert('user', [
-        'username' => 'dholzgang',
-        'email' => 'webmaster@redclover.com',
+        'username' => 'webmaster@redclover.com',
         'password' => Yii::$app->getSecurity()->generatePasswordHash('r3dcl0v3r'),
         'authkey' => uniqid(),
         'access_token' => Yii::$app->getSecurity()->generateRandomString(),
     ]);
     $this->insert('user', [
-        'username' => 'admin',
-        'email' => 'ngoadmin@redclover.com',
+        'username' => 'ngoadmin@redclover.com',
         'password' => Yii::$app->getSecurity()->generatePasswordHash('admin'),
         'authkey' => uniqid(),
         'access_token' => Yii::$app->getSecurity()->generateRandomString(),
     ]);
     $this->insert('user', [
         'username' => 'demo@nowhere.com',
-        'email' => 'demo@nowhere.com',
         'password' => Yii::$app->getSecurity()->generatePasswordHash('demo'),
         'authkey' => uniqid(),
         'access_token' => Yii::$app->getSecurity()->generateRandomString(),
