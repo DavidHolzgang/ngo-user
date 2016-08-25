@@ -15,7 +15,7 @@ return [
         'id' => '2',
         'username' => 'ngodemo@nowhere.com',
         'password' => Yii::$app->getSecurity()->generatePasswordHash('demo'),
-        'authkey' => 'validUserKey',
+        'authkey' => 'validDemoKey',
         'access_token' => 'validDemoToken',
         'first_name' => 'Demo'
     ],

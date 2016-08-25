@@ -34,6 +34,9 @@ class UserTest extends DbTestCase
     $expectedId = 1;
     // id 1 (ngoadmin/admin) should always be present
     $this->assertNotNull($this->_user);
+    // check user record is returned
+    $expectedUser = $this->_user->findIdentity($expectedId);
+    $this->assertNotNull($expectedUser);
   }
 
   
@@ -60,12 +63,6 @@ class UserTest extends DbTestCase
 
     $this->assertEquals($expectedId, $expectedUser->getId());
   }
-
-  public function testFindIdentityByAccessTokenFailsForInvalidToken()
-  {
-    $expectedUser = $this->_user->findIdentityByAccessToken('token');
-    $this->assertNull($expectedUser);
-  }
   
   // findIdentityByAccessToken($token)
   public function testFindIdentityByAccessTokenSucceedsForValidToken()
@@ -76,4 +73,72 @@ class UserTest extends DbTestCase
     $this->assertNotNull($expectedUser);
 
   } 
+
+  public function testFindIdentityByAccessTokenFailsForInvalidToken()
+  {
+    $expectedUser = $this->_user->findIdentityByAccessToken('token');
+    $this->assertNull($expectedUser);
+  }
+  
+  // findByUsername($username)
+  public function testFindByUsernameSucceedsForValidName()
+  {
+    // user 'ngodemo/demo' has been created by fixture    
+    $username = 'ngodemo@nowhere.com';
+    $expectedUser = $this->_user->findByUsername($username);
+    $this->assertNotNull($expectedUser);
+
+  } 
+
+  public function testFindByUsernameFailsForInvalidName()
+  {
+    $expectedUser = $this->_user->findIdentityByAccessToken('demo');
+    $this->assertNull($expectedUser);
+  }
+  
+  // validateAuthKey($authKey)
+  public function testValidateAuthKeySucceedsForValidKey()
+  {
+    $expectedId = 2;
+    // user 2 'ngodemo/demo' has been created by fixture    
+    $expectedUser = $this->_user->findIdentity($expectedId);
+    $authKey = 'validDemoKey';
+    $this->assertTrue($expectedUser->validateAuthKey($authKey));
+  } 
+
+  public function testValidateAuthKeyFailsForInvalidKey()
+  {
+    $authKey = 'invalidKey';
+    $this->assertFalse($this->_user->validateAuthKey($authKey));
+  }
+  
+  // validatePassword($password)
+  public function testValidatePasswordSucceedsForValidPassword()
+  {
+    $expectedId = 2;
+    // user 2 'ngodemo/demo' has been created by fixture    
+    $expectedUser = $this->_user->findIdentity($expectedId);
+    $password = 'demo';
+    $this->assertTrue($expectedUser->validatePassword($password));
+  } 
+
+  public function testValidatePasswordFailsForInvalidPassword()
+  {
+    $expectedId = 2;
+    // user 2 'ngodemo/demo' has been created by fixture    
+    $expectedUser = $this->_user->findIdentity($expectedId);
+    $password = 'notMyPassword';
+    $this->assertFalse($expectedUser->validatePassword($password));
+  }
+
+  /**
+   * @expectedException yii\base\InvalidParamException
+   */
+  public function testValidatePasswordFailsForNoCurrentUser()
+  {
+    // note that we have not set a current user, so $this->_user is uninitialized
+    $password = 'demo';
+    $this->_user->validatePassword($password);
+  }
+  
 }

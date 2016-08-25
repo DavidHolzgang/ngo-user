@@ -89,6 +89,18 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
      $this->password = Yii::$app->security->generatePasswordHash($password); 
    } 
  
+    
+   /** 
+    * Validate given password for a user 
+    *  
+    * @param string $password password to be validated
+    * @return boolean true if password is valid for current user | false otherwise 
+    */ 
+   public function validatePassword($password) 
+   { 
+     return Yii::$app->getSecurity()->validatePassword($password, $this->password); 
+   } 
+ 
  
    // implement IdentityInterface abstract methods 
    /** 
@@ -118,6 +130,19 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
    } 
  
     
+   // implement LoginForm utility methods 
+   /** 
+    * Find user by username 
+    *  
+    * @param string $username 
+    * @return static | null 
+    */ 
+   public static function findByUsername($username) 
+   { 
+     return self::findOne(['username' => $username]); 
+   } 
+ 
+    
    /** 
     * @inheritdoc 
     */ 
@@ -133,31 +158,6 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
    public function validateAuthKey($authKey) 
    { 
      return ($this->authkey === $authKey); 
-   } 
- 
-    
-   // implement LoginForm utility methods 
-   /** 
-    * Find user by username 
-    *  
-    * @param string $username 
-    * @return static | null 
-    */ 
-   public static function findByUsername($username) 
-   { 
-     return self::findOne(['username' => $username]); 
-   } 
- 
-    
-   /** 
-    * Validate given password for a user 
-    *  
-    * @param string $password password to be validated
-    * @return boolean true if password is valid for current user | false otherwise 
-    */ 
-   public function validatePassword($password) 
-   { 
-     return Yii::$app->getSecurity()->validatePassword($password, $this->password); 
    } 
     
 }
