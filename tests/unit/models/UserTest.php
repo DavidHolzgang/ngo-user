@@ -1,42 +1,79 @@
 <?php
-namespace tests\models;
+namespace app\tests\unit\models;
+
+use yii\codeception\DbTestCase;
 use app\models\User;
+use app\tests\fixtures\UserFixture;
 
-class UserTest extends \Codeception\Test\Unit
+class UserTest extends DbTestCase
 {
-    public function testFindUserById()
-    {
-        expect_that($user = User::findIdentity(2));
-        expect($user->username)->equals('ngoadmin@redclover.com');
+  /**
+   * 
+   * @var User
+   */
+  private $_user = null;
 
-        expect_not(User::findIdentity(999));
-    }
+  public function fixtures()
+  {
+    return [
+        'user' => UserFixture::className()
+    ];
+  }
 
-    public function testFindUserByAccessToken()
-    {
-        expect_that($user = User::findIdentityByAccessToken('eYVErsGcxLeIdYQSQigtIfz46V7ss5yN'));
-        expect($user->username)->equals('ngoadmin@redclover.com');
+  protected function setUp()
+  {
+    parent::setUp();
+    //  use createFixtures() instead of loadFixtures()
+    $this->_user = new \app\models\User;
+  }
+ 
 
-        expect_not(User::findIdentityByAccessToken('non-existing'));        
-    }
+  // Start with basic find user tests
+  public function testFindIdentityByIdSucceedsForValidId()
+  {
+    $expectedId = 1;
+    // id 1 (ngoadmin/admin) should always be present
+    $this->assertNotNull($this->_user);
+  }
 
-    public function testFindUserByUsername()
-    {
-        expect_that($user = User::findByUsername('ngoadmin@redclover.com'));
-        expect_not(User::findByUsername('not-admin'));
-    }
+  
+  public function testFindIdentityByIdReturnsNullForInvalidId()
+  {
+    // id -1 should never be present
+    $this->assertNull($this->_user->findIdentity(-1));
+  }
 
-    /**
-     * @depends testFindUserByUsername
-     */
-    public function testValidateUser($user)
-    {
-        $user = User::findByUsername('ngoadmin@redclover.com');
-        expect_that($user->validateAuthKey('57ba124c3dc79'));
-        expect_not($user->validateAuthKey('57b8dfc2256b1'));
+  /**
+   * @expectedException ErrorException
+   */
+  public function testFindIdentityByIdFailsIfNoParameters()
+  {
+    $this->_user->findIdentity();
+  }
 
-        expect_that($user->validatePassword('admin'));
-        expect_not($user->validatePassword('123456'));        
-    }
+  // getId()
+  public function testGetIdSucceedsForValidUser()
+  {
+    $expectedId = 1;
+    // id 1 (ngoadmin/admin) should always be present
+    $expectedUser = $this->_user->findIdentity($expectedId);
 
+    $this->assertEquals($expectedId, $expectedUser->getId());
+  }
+
+  public function testFindIdentityByAccessTokenFailsForInvalidToken()
+  {
+    $expectedUser = $this->_user->findIdentityByAccessToken('token');
+    $this->assertNull($expectedUser);
+  }
+  
+  // findIdentityByAccessToken($token)
+  public function testFindIdentityByAccessTokenSucceedsForValidToken()
+  {
+    // id 1 (ngoadmin/admin) should always be present    
+    $token = 'validDemoToken';
+    $expectedUser = $this->_user->findIdentityByAccessToken($token);
+    $this->assertNotNull($expectedUser);
+
+  } 
 }
