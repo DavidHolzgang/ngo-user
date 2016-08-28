@@ -4,7 +4,7 @@
 
 namespace app\controllers;
 
-/* 
+/*
  * The MIT License
  *
  * Copyright 2016 dholzgang.
@@ -30,7 +30,9 @@ namespace app\controllers;
 
 use Yii;
 use app\models\User;
+use app\models\LoginForm;
 use yii\web\ForbiddenHttpException;
+use yii\web\UnauthorizedHttpException;
 use yii\filters\auth\HttpBasicAuth;
 use yii\rest\ActiveController;
 
@@ -39,38 +41,78 @@ use yii\rest\ActiveController;
  */
 class UserController extends ActiveController
 {
+
   public $modelClass = 'app\models\User';
-  
-  
+
   /**
    * @inheritdoc
    */
   public function behaviors()
   {
     $behaviors = parent::behaviors();
-    
+
     $behaviors['authenticator'] = [
-      'class' => HttpBasicAuth::className(),
-      'except' => ['index'],
+        'class' => HttpBasicAuth::className(),
+        'except' => ['index', 'login'],
     ];
-    
+
     return $behaviors;
   }
 
-  
+  /**
+   * Login action.
+   *
+   * @return string
+   */
+  public function actionLogin()
+  {
+    Yii::trace('entering login -- parameters are: ' . print_r(Yii::$app->request->post(), true), 'controllers/UserController/actionLogin');
+
+    $model = new LoginForm();
+    $inputArray = Yii::$app->request->post();
+    $model->username = $inputArray['username'];
+    $model->password = $inputArray['password'];
+    
+    if ($model->login()) {
+      \Yii::$app->response->format = \yii\web\response::FORMAT_JSON;
+      return [
+          'message' => 'success',
+          'token' => $model->getAccessToken(),
+      ];
+    }
+    throw new \yii\web\UnauthorizedHttpException; // login fails here
+  }
+
+  /**
+   * Logout action.
+   *
+   * @return string
+   */
+  public function actionLogout()
+  {
+    Yii::$app->user->logout();
+
+    return NULL; //logout succeeds -- kill authToken & return 200 response
+  }
+
   /**
    * @inheritdoc
    * @codeCoverageIgnore
    */
   public function checkAccess($action, $model = null, $params = [])
   {
-    Yii::trace('action is ' . print_r($action, true), 'controllers/UserController');
+    Yii::trace('action is ' . print_r($action, true), 'controllers/UserController/checkAccess');
     if (\Yii::$app->user->isGuest) {
-      // a guest user can only view a user list
-      if ($action !== 'index') {
-        throw new ForbiddenHttpException;
+      // a guest user can only view a user list or login
+      switch ($action) {
+        case 'index':
+          break;
+        case 'login':
+          break;
+        default:
+          throw new ForbiddenHttpException;      
       }
     }
   }
-  
+
 }

@@ -6,7 +6,8 @@ use Yii;
 use yii\base\Model;
 
 /**
- * LoginForm is the model behind the login form.
+ * LoginForm is the model behind login processing.
+ * NOTE that this is not an actual form, but simply an abstraction for processing
  *
  * @property User|null $user This property is read-only.
  *
@@ -15,7 +16,7 @@ class LoginForm extends Model
 {
     public $username;
     public $password;
-    public $rememberMe = true;
+    public $rememberMe = false;
 
     private $_user = false;
 
@@ -59,8 +60,19 @@ class LoginForm extends Model
      */
     public function login()
     {
+        Yii::trace('entering login -- parameters are: ' . print_r($this, true), 'models/LoginForm/login');
+      
         if ($this->validate()) {
-            return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
+            if (!Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0)) {
+              return false;
+            } else {
+              /* TODO
+               * set last login
+               * create new access token
+               * store new access token
+               */
+              return true; // return access token
+            }
         }
         return false;
     }
@@ -77,5 +89,19 @@ class LoginForm extends Model
         }
 
         return $this->_user;
+    }
+
+    /**
+     * Return access token for current user
+     *
+     * @return User access token | null
+     */
+    public function getAccessToken()
+    {
+        if ($this->_user === false) {
+            $this->_user = User::findByUsername($this->username);
+        }
+
+        return $this->_user->access_token;
     }
 }
