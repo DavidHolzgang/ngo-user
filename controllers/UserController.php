@@ -90,6 +90,8 @@ class UserController extends ActiveController
    */
   public function actionLogout()
   {
+    Yii::trace('entering logout -- parameters are: ' . print_r(Yii::$app->request->post(), true), 'controllers/UserController/actionLogout');
+
     Yii::$app->user->logout();
 
     return NULL; //logout succeeds -- kill authToken & return 200 response

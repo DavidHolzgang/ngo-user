@@ -17,15 +17,15 @@ class LoginFormCest
     {
         $I->amLoggedInAs(2);
         $I->amOnPage('/');
-        $I->see('Logout (admin)');
+        $I->see('Logout (ngodemo@nowhere.com)');
     }
 
     // demonstrates `amLoggedInAs` method
     public function internalLoginByInstance(\FunctionalTester $I)
     {
-        $I->amLoggedInAs(\app\models\User::findByUsername('admin'));
+        $I->amLoggedInAs(\app\models\User::findByUsername('ngoadmin@redclover.com'));
         $I->amOnPage('/');
-        $I->see('Logout (admin)');
+        $I->see('Logout (ngoadmin@redclover.com)');
     }
 
     public function loginWithEmptyCredentials(\FunctionalTester $I)
@@ -39,7 +39,7 @@ class LoginFormCest
     public function loginWithWrongCredentials(\FunctionalTester $I)
     {
         $I->submitForm('#login-form', [
-            'LoginForm[username]' => 'admin',
+            'LoginForm[username]' => 'ngoadmin@redclover.com',
             'LoginForm[password]' => 'wrong',
         ]);
         $I->expectTo('see validations errors');
@@ -49,10 +49,10 @@ class LoginFormCest
     public function loginSuccessfully(\FunctionalTester $I)
     {
         $I->submitForm('#login-form', [
-            'LoginForm[username]' => 'admin',
+            'LoginForm[username]' => 'ngoadmin@redclover.com',
             'LoginForm[password]' => 'admin',
         ]);
-        $I->see('Logout (admin)');
+        $I->see('Logout (ngoadmin@redclover.com)');
         $I->dontSeeElement('form#login-form');              
     }
 }

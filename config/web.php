@@ -51,7 +51,10 @@ $config = [
                 [
                     'class' => 'yii\rest\UrlRule', 
                     'controller' => 'user',
-                    'extraPatterns' => ['POST login' => 'login'],
+                    'extraPatterns' => [
+                        'POST login' => 'login',
+                        'POST logout' => 'logout'
+                      ],
                 ],
             ],
         ],
@@ -70,7 +73,15 @@ if (YII_ENV_DEV) {
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
       'class' => 'yii\gii\Module',
-      'allowedIPs' => ['127.0.0.1', '::1', '10.0.0.140'] // allow devserver01 as well as localhost
+      'allowedIPs' => ['127.0.0.1', '::1', '10.0.0.140'], // allow devserver01 as well as localhost
+    ];
+}
+
+if (YII_DEBUG) {
+    $config['bootstrap'][] = 'debug';
+    $config['modules']['debug'] = [
+        'class'      => 'yii\debug\Module',
+        'allowedIPs' => ['127.0.0.1', '::1', '10.0.0.140'], // allow devserver01 as well as localhost
     ];
 }
 
