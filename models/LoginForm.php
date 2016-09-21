@@ -71,7 +71,8 @@ class LoginForm extends Model
                * create new access token
                * store new access token
                */
-              return true; // return access token
+              $this->setLoginData();
+              return true; // return success
             }
         }
         return false;
@@ -92,7 +93,7 @@ class LoginForm extends Model
     }
 
     /**
-     * Return access token for current user
+     * Returns access token for [[username]]
      *
      * @return User access token | null
      */
@@ -103,5 +104,29 @@ class LoginForm extends Model
         }
 
         return $this->_user->access_token;
+    }
+
+    /**
+     * Returns access token for [[username]]
+     *
+     * @return User access token | null
+     */
+    public function setLoginData()
+    {
+      
+      Yii::trace('entering set tracking data ', 'models/LoginForm/setLoginData');
+      $format = 'Y-m-d h:m:s';
+      $expDate = time() + (24 * 60 * 60);
+      $updateData = [
+          'last_login_time' => date($format),
+          'token_expiration' => date($format, $expDate)
+      ];
+      Yii::trace('tracking data is: ' . print_r($updateData, true), 'models/LoginForm/setLoginData');
+      // post to database
+      $user = $this->getUser();
+      $count = $user->updateAttributes($updateData);
+      Yii::trace('reccords updated were: ' . print_r($count, true), 'models/LoginForm/setLoginData');
+    
+      return true;
     }
 }
