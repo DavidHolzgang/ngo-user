@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use yii\web\ServerErrorHttpException;
 
 /**
  * LoginForm is the model behind login processing.
@@ -60,7 +61,7 @@ class LoginForm extends Model
      */
     public function login()
     {
-        Yii::trace('entering login -- parameters are: ' . print_r($this, true), 'models/LoginForm/login');
+        Yii::trace('entering login -- parameters are: ' . print_r($this, true), __METHOD__);
       
         if ($this->validate()) {
             if (!Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0)) {
@@ -114,19 +115,21 @@ class LoginForm extends Model
     public function setLoginData()
     {
       
-      Yii::trace('entering set tracking data ', 'models/LoginForm/setLoginData');
+      Yii::trace('entering set tracking data ', __METHOD__);
       $format = 'Y-m-d h:m:s';
       $expDate = time() + (24 * 60 * 60);
       $updateData = [
           'last_login_time' => date($format),
           'token_expiration' => date($format, $expDate)
       ];
-      Yii::trace('tracking data is: ' . print_r($updateData, true), 'models/LoginForm/setLoginData');
       // post to database
       $user = $this->getUser();
       $count = $user->updateAttributes($updateData);
-      Yii::trace('reccords updated were: ' . print_r($count, true), 'models/LoginForm/setLoginData');
-    
+      if ($count !== 1) {
+        // internal error
+        Yii::error('error updating login data - count returned ' . print_r($count, true), __METHOD__);
+        throw new \yii\web\ServerErrorHttpException; // data save fails here    }
+      }
       return true;
     }
 }
