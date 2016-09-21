@@ -33,6 +33,7 @@ use app\models\User;
 use app\models\LoginForm;
 use yii\web\ForbiddenHttpException;
 use yii\web\UnauthorizedHttpException;
+use yii\web\ServerErrorHttpException;
 use yii\filters\auth\HttpBasicAuth;
 use yii\rest\ActiveController;
 
@@ -90,10 +91,22 @@ class UserController extends ActiveController
    */
   public function actionLogout()
   {
-    Yii::trace('entering logout -- parameters are: ' . print_r(Yii::$app->request->post(), true), 'controllers/UserController/actionLogout');
+    Yii::trace('entering logout ', __METHOD__);
+    // for some reason, the access check isn't run for 'logout'??
+    $this->checkAccess('logout');
 
-    Yii::$app->user->logout();
+    // set up to clean up user record
+    $userId = Yii::$app->user->identity;
 
+    if (!Yii::$app->user->logout()) {
+      Yii::error('logout failed for user ' . print_r($userId, false), __METHOD__);
+      throw new ServerErrorHttpException('logout failed');
+    }
+    $count = $userId->updateAttributes(['token_expiration' => null]);
+    if ($count !== 1) {
+      Yii::error('database update failed for user ' . print_r($userId, false), __METHOD__);
+      throw new ServerErrorHttpException('database update failed');
+    }
     return NULL; //logout succeeds -- kill authToken & return 200 response
   }
 
@@ -103,7 +116,7 @@ class UserController extends ActiveController
    */
   public function checkAccess($action, $model = null, $params = [])
   {
-    Yii::trace('action is ' . print_r($action, true), 'controllers/UserController/checkAccess');
+    Yii::trace('action is ' . print_r($action, true), __METHOD__);
     if (\Yii::$app->user->isGuest) {
       // a guest user can only view a user list or login
       switch ($action) {
@@ -114,6 +127,16 @@ class UserController extends ActiveController
         default:
           throw new ForbiddenHttpException;      
       }
+    } else {
+      // action is OK, check for valid token
+      $userId = Yii::$app->user->identity;
+      $current_time = time();
+      $expTime = strtotime($userId->token_expiration);
+      if ($current_time > $expTime) {
+        Yii::trace('token has expired', __METHOD__);
+        throw new UnauthorizedHttpException('token has expired');
+      }
+      Yii::trace('token is valid', __METHOD__);
     }
   }
 
