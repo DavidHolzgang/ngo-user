@@ -42,7 +42,10 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
-        //
+        /* 
+         * N.B. We use POST action for 'login' and 'logout' to maintain 
+         * compatibilty with form-based actions
+         */        
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,

@@ -159,5 +159,23 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
    { 
      return ($this->authkey === $authKey); 
    } 
-    
+
+   
+  
+  /**
+   * @inheritdoc
+   * run before the validation action to set generated User data
+   */
+
+  public function beforeValidate()
+  {
+    Yii::trace('run beforeValidate with model data ' . print_r($this, true), __METHOD__);
+    if ($this->isNewRecord) {
+      $this->setPassword($this->password);
+      $this->access_token = Yii::$app->getSecurity()->generateRandomString();
+      $this->authkey = uniqid();
+    }
+    return parent::beforeValidate();
+  }
+
 }

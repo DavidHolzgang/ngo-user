@@ -54,7 +54,7 @@ class UserController extends ActiveController
 
     $behaviors['authenticator'] = [
         'class' => HttpBasicAuth::className(),
-        'except' => ['index', 'login'],
+        'except' => ['index', 'login', 'create'],
     ];
 
     return $behaviors;
@@ -118,8 +118,10 @@ class UserController extends ActiveController
   {
     Yii::trace('action is ' . print_r($action, true), __METHOD__);
     if (\Yii::$app->user->isGuest) {
-      // a guest user can only view a user list or login
+      // a guest user can only view a user list, register or login
       switch ($action) {
+        case 'create':
+          break;
         case 'index':
           break;
         case 'login':
