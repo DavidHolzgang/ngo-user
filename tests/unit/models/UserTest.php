@@ -95,6 +95,7 @@ class UserTest extends DbTestCase
     $expectedUser = $this->_user->findIdentityByAccessToken('demo');
     $this->assertNull($expectedUser);
   }
+
   
   // validateAuthKey($authKey)
   public function testValidateAuthKeySucceedsForValidKey()
@@ -111,6 +112,7 @@ class UserTest extends DbTestCase
     $authKey = 'invalidKey';
     $this->assertFalse($this->_user->validateAuthKey($authKey));
   }
+
   
   // validatePassword($password)
   public function testValidatePasswordSucceedsForValidPassword()
@@ -139,6 +141,28 @@ class UserTest extends DbTestCase
     // note that we have not set a current user, so $this->_user is uninitialized
     $password = 'demo';
     $this->_user->validatePassword($password);
+  }
+
+  
+  // create new user ($data)
+  public function testCreateNewUserSucceedsForValidData()
+  {
+    $this->_user->username = "nemo@nowhere.com";
+    $this->_user->password = "Nautilus";
+    $this->assertTrue($this->_user->save());
+  } 
+
+  public function testCreateNewUserFailsForMissingData()
+  {
+    $this->_user->username = "nemo@nowhere.com";
+    $this->assertFalse($this->_user->save());
+  }
+
+  public function testCreateNewUserFailsForDuplicateUsername()
+  {
+    $this->_user->username = "ngodemo@nowhere.com";
+    $this->_user->password = "demo";
+    $this->assertFalse(false);
   }
   
 }
