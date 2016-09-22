@@ -36,6 +36,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return [
             [['username', 'password', 'authkey'], 'required'],
             [['username'], 'email'],
+            [['username'], 'unique'],
             [['last_login_time', 'token_expiration'], 'safe'],
             [['username', 'last_name'], 'string', 'max' => 128],
             [['password'], 'string', 'max' => 126],
@@ -115,18 +116,18 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
    /** 
     * @inheritdoc 
     */ 
-   public static function findIdentityByAccessToken($token, $type = null) 
+   public function getId() 
    { 
-     return self::findOne(['access_token' => $token]); 
+     return $this->id; 
    } 
  
     
    /** 
     * @inheritdoc 
     */ 
-   public function getId() 
+   public static function findIdentityByAccessToken($token, $type = null) 
    { 
-     return $this->id; 
+     return self::findOne(['access_token' => $token]); 
    } 
  
     
@@ -159,5 +160,25 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
    { 
      return ($this->authkey === $authKey); 
    } 
-    
+
+   
+  
+  /**
+   * @inheritdoc
+   * run before the validation action to set generated User data
+   */
+
+  public function beforeValidate()
+  {
+    Yii::trace('run beforeValidate with model data ' . print_r($this, true), __METHOD__);
+    if ($this->isNewRecord) {
+      if ($this->password) {
+        $this->setPassword($this->password);
+      }
+      $this->access_token = Yii::$app->getSecurity()->generateRandomString();
+      $this->authkey = uniqid();
+    }
+    return parent::beforeValidate();
+  }
+
 }
