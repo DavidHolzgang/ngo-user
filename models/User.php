@@ -36,6 +36,7 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
         return [
             [['username', 'password', 'authkey'], 'required'],
             [['username'], 'email'],
+            [['username'], 'unique'],
             [['last_login_time', 'token_expiration'], 'safe'],
             [['username', 'last_name'], 'string', 'max' => 128],
             [['password'], 'string', 'max' => 126],
@@ -171,7 +172,9 @@ class User extends \yii\db\ActiveRecord implements \yii\web\IdentityInterface
   {
     Yii::trace('run beforeValidate with model data ' . print_r($this, true), __METHOD__);
     if ($this->isNewRecord) {
-      $this->setPassword($this->password);
+      if ($this->password) {
+        $this->setPassword($this->password);
+      }
       $this->access_token = Yii::$app->getSecurity()->generateRandomString();
       $this->authkey = uniqid();
     }
