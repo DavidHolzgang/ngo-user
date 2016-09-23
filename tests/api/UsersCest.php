@@ -8,13 +8,13 @@ class UsersCest
 
   public function listAllUsers(\ApiTester $I)
   {
-    $I->wantTo('check list all users');
+    $I->seeInDatabase('user', array('username' => 'ngodemox@nowhere.com'));
+    $I->wantTo('check list of all users');
     $I->sendGET('/users');
     $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); // 200
     $I->seeResponseIsJson();
-    $I->seeResponseContainsJson(['username' => 'ngoadmin@redclover.com']);
+    $I->seeResponseContainsJson(['username' => 'ngodemox@nowhere.com']);
   }
   
 }
-
 

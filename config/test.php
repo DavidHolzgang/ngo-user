@@ -15,10 +15,25 @@ return [
             'useFileTransport' => true,
         ],
         'urlManager' => [
-            'showScriptName' => true,
+            'enablePrettyUrl' => true,
+            'enableStrictParsing' => true,
+            'showScriptName' => false,
+            'hostInfo' => 'http://dev.apiuser.com/',
+            'rules' => [
+                [
+                    'class' => 'yii\rest\UrlRule', 
+                    'controller' => 'user',
+                    'extraPatterns' => [
+                        'POST login' => 'login',
+                        'POST logout' => 'logout'
+                      ],
+                ],
+            ],
         ],
         'user' => [
             'identityClass' => 'app\models\User',
+            'enableSession' => false,
+            'loginUrl' => null,
         ],        
         'request' => [
             'cookieValidationKey' => 'test',

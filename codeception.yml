@@ -10,8 +10,16 @@ settings:
     colors: true
 modules:
     config:
-        Yii2:
-            configFile: 'config/test.php'
+      Db:
+        dsn: 'mysql:host=localhost;dbname=ngo_tests'
+        user: 'webdev'
+        password: 'w3bd3v'
+        dump: 'tests/_data/ngo_tests.sql'
+        populate: true
+        cleanup: false
+        reconnect: false
+      Yii2:
+          configFile: 'config/test.php'
 
 # To enable code coverage:
 #coverage:
