@@ -14,6 +14,17 @@ return [
         'mailer' => [
             'useFileTransport' => true,
         ],
+        'log' => [
+            'flushInterval' => 1,
+            'traceLevel' => 3,
+            'targets' => [
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['error', 'warning', 'info', 'trace'],
+                    'exportInterval' => 1,
+                ],
+            ],
+        ],
         'urlManager' => [
             'enablePrettyUrl' => true,
             'enableStrictParsing' => true,
