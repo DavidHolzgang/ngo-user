@@ -119,25 +119,58 @@ class UsersCest
   // DELETE function
   public function deleteOneUser(\ApiTester $I)
   {
-    // stub function
-    $I->wantTo('delete an existing user');
+    $I->seeInDatabase('user', array('username' => 'novus@nowhere.com'));
+    $I->wantTo('login the new user');
+    $I->sendPOST('/users/login', [
+        'username' => 'novus@nowhere.com',
+        'password' => 'NewMan'
+    ]);    
+    $I->seeResponseCodeIs(\Codeception\Util\HttpCode::OK); // 200
+    $I->dontSeeInDatabase('user', array('username' => 'novus@nowhere.com', 'token_expiration' => NULL));
+    $token = $I->grabFromDatabase('user', 'access_token', array('username' => 'novus@nowhere.com'));
+    $I->wantTo('delete the new user');
+    $I->amHttpAuthenticated($token, '');    
+    $I->sendDELETE('/users/3');
+    $I->seeResponseCodeIs(\Codeception\Util\HttpCode::NO_CONTENT); // 204
+    $I->dontSeeInDatabase('user', array('username' => 'novus@nowhere.com'));
   }
 
   /*
-   * Token hanlding methocs
+   * Token handling methods
    */
   // invalid token function
   public function accessFailsInvalidToken(\ApiTester $I)
   {
-    // stub function
+    $I->seeInDatabase('user', array('username' => 'ngodemox@nowhere.com'));
+    $I->dontSeeInDatabase('user', array('username' => 'ngodemox@nowhere.com', 'token_expiration' => NULL));
     $I->wantTo('check that invalid token will not provide access');
+    $I->haveHttpHeader('Content-Type', 'application/json');    
+    $I->amHttpAuthenticated('invalidDemoToken', '');    
+    $I->sendGET('/users/2');
+    $I->seeResponseCodeIs(\Codeception\Util\HttpCode::UNAUTHORIZED); // 401
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson(array('message' => 'Your request was made with invalid credentials.'));
   }
 
     // expired token function
   public function accessFailsExpiredToken(\ApiTester $I)
   {
-    // stub function
     $I->wantTo('check that expired token will not provide access');
+    $data = array(
+        'username' => 'testuser@nowhere.com',
+        'password' => 'nothing',
+        'authkey' => 'authTestKey',
+        'access_token' => 'validTestToken',
+        'last_login_time' => '2016-09-20 00:00:00',
+        'token_expiration' => '2016-09-21 00:00:00'
+    );    
+    $I->haveInDatabase('user', $data);
+    $I->haveHttpHeader('Content-Type', 'application/json');    
+    $I->amHttpAuthenticated('validTestToken', '');    
+    $I->sendGET('/users/2');
+    $I->seeResponseCodeIs(\Codeception\Util\HttpCode::UNAUTHORIZED); // 401
+    $I->seeResponseIsJson();
+    $I->seeResponseContainsJson(array('message' => 'token has expired'));
   }
 
     public function logoutDemoUser(\ApiTester $I)
