@@ -1,0 +1,13 @@
+class_name: ApiTester
+modules:
+    enabled:
+      - \Helper\Api
+      - Db
+      - REST:
+          url: 'http://dev.apiuser.com'
+          part: Json
+          depends: Yii2
+    config:
+      - Yii2:
+          configFile: 'config/test.php'
+          entryScript: index-test.php

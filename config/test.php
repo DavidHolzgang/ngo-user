@@ -14,11 +14,37 @@ return [
         'mailer' => [
             'useFileTransport' => true,
         ],
+        'log' => [
+            'flushInterval' => 1,
+            'traceLevel' => 3,
+            'targets' => [
+                [
+                    'class' => 'yii\log\FileTarget',
+                    'levels' => ['error', 'warning', 'info', 'trace'],
+                    'exportInterval' => 1,
+                ],
+            ],
+        ],
         'urlManager' => [
-            'showScriptName' => true,
+            'enablePrettyUrl' => true,
+            'enableStrictParsing' => true,
+            'showScriptName' => false,
+            'hostInfo' => 'http://dev.apiuser.com/',
+            'rules' => [
+                [
+                    'class' => 'yii\rest\UrlRule', 
+                    'controller' => 'user',
+                    'extraPatterns' => [
+                        'POST login' => 'login',
+                        'POST logout' => 'logout'
+                      ],
+                ],
+            ],
         ],
         'user' => [
             'identityClass' => 'app\models\User',
+            'enableSession' => false,
+            'loginUrl' => null,
         ],        
         'request' => [
             'cookieValidationKey' => 'test',

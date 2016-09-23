@@ -33,6 +33,7 @@ use app\models\User;
 use app\models\LoginForm;
 use yii\web\ForbiddenHttpException;
 use yii\web\UnauthorizedHttpException;
+use yii\web\UnprocessableEntityHttpException;
 use yii\web\ServerErrorHttpException;
 use yii\filters\auth\HttpBasicAuth;
 use yii\rest\ActiveController;
@@ -71,6 +72,10 @@ class UserController extends ActiveController
 
     $model = new LoginForm();
     $inputArray = Yii::$app->request->post();
+    // check that we have required data
+    if (!(array_key_exists('username', $inputArray) && array_key_exists('password', $inputArray))) {
+      throw new UnprocessableEntityHttpException('username and/or password are missing');
+    }
     $model->username = $inputArray['username'];
     $model->password = $inputArray['password'];
     
@@ -81,7 +86,7 @@ class UserController extends ActiveController
           'token' => $model->getAccessToken(),
       ];
     }
-    throw new \yii\web\UnauthorizedHttpException; // login fails here
+    throw new \yii\web\UnauthorizedHttpException('invalid login parameters'); // login fails here
   }
 
   /**
